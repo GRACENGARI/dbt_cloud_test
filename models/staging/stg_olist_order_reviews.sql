@@ -12,6 +12,20 @@ renamed as (
         safe_cast(review_creation_date as timestamp) as review_created_at,
         safe_cast(review_answer_timestamp as timestamp) as review_answered_at
     from source
+),
+filtered as(
+select
+    review_id,
+        order_id,
+        review_score,
+        review_comment_title,
+        review_comment_message,
+        review_created_at,
+        review_answered_at
+    from renamed
+
+
+
 )
 
-select * from renamed
+select * from filtered

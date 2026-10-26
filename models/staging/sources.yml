@@ -6,9 +6,30 @@ sources:
     schema: olist_raw
     tables:
       - name: customers
+
       - name: orders
+        description: one row per order
+        config:
+          loaded_at_field: order_purchase_timestamp
+          freshness:
+            warn_after: {count: 5000, period: day}
+            error_after: {count: 8000, period: day}
+
       - name: order_items
+        description: one row per order item
+        config:
+          loaded_at_field: shipping_limit_date
+          freshness:
+            warn_after: {count: 5000, period: day}
+            error_after: {count: 8000, period: day}
+
       - name: order_payments
+        description: one row per order payment
+        config:
+          freshness:
+            warn_after: {count: 5000, period: day}
+            error_after: {count: 8000, period: day}
+
       - name: order_reviews
       - name: products
       - name: sellers
