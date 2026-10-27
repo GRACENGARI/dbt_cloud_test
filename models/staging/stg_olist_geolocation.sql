@@ -3,11 +3,11 @@ with source as (
 ),
 renamed as (
     select
-        geolocation_zip_code_prefix as zip_code_prefix,
+        cast(geolocation_zip_code_prefix as string)as zip_code_prefix,
         geolocation_lat as lat,
         geolocation_lng as lng,
-        geolocation_city as city,
-        geolocation_state as state
+        lower(trim(geolocation_city)) as city,
+        upper(trim(geolocation_state)) as state
     from source
 
 )
