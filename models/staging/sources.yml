@@ -4,11 +4,16 @@ sources:
   - name: olist_raw
     database: dbt-master-class
     schema: olist_raw
+    description: >
+      Raw, unmodified data from the Olist Brazilian e-commerce public dataset,
+      covering roughly 100k orders placed on the Olist marketplace between 2016
+      and 2018. Olist connects small merchants to major Brazilian marketplaces.
     tables:
       - name: customers
+        description: One row per customer
 
       - name: orders
-        description: one row per order
+        description: One row per order
         config:
           loaded_at_field: order_purchase_timestamp
           freshness:
@@ -16,7 +21,7 @@ sources:
             error_after: {count: 8000, period: day}
 
       - name: order_items
-        description: one row per order item
+        description: One row per order item
         config:
           loaded_at_field: shipping_limit_date
           freshness:
@@ -24,14 +29,23 @@ sources:
             error_after: {count: 8000, period: day}
 
       - name: order_payments
-        description: one row per order payment
+        description: One row per order payment
         config:
           freshness:
             warn_after: {count: 5000, period: day}
             error_after: {count: 8000, period: day}
 
       - name: order_reviews
+        description: One row per order review
+
       - name: products
+        description: One row per product
+
       - name: sellers
+        description: One row per seller
+
       - name: geolocation
+        description: One row per geolocation record
+
       - name: product_category
+        description: One row per product category
