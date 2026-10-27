@@ -1,0 +1,12 @@
+snapshots:
+  - name: snap_olist_customers
+    relation: source('olist_raw', 'customers')
+    description: >
+      Tracks all changes to the customers table over time.
+    config:
+      schema: snapshots
+      unique_key: customer_id
+      strategy: check
+      check_cols:
+        - customer_city
+        - customer_state
