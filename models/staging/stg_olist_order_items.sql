@@ -8,7 +8,7 @@ renamed as (
         order_item_id as order_item_number,
         product_id,
         seller_id,
-        safe_cast(shipping_limit_date as timestamp) as shipping_limit_at,
+        {{standardize_text('safe_cast(shipping_limit_date as timestamp)')}} as shipping_limit_at,
         price as item_price,
         freight_value as freight_amount
     from source
