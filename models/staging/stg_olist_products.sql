@@ -5,7 +5,7 @@ with source as (
 renamed as (
     select
         product_id,
-       lower(trim(product_category_name)) as category_name,
+       {{standardize_text('product_category_name')}} as category_name,
         product_name_lenght as name_length,
         product_description_lenght as description_length,
         product_photos_qty as photos_qty,

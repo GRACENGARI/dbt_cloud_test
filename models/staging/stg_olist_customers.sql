@@ -6,9 +6,9 @@ renamed as (
     select
     customer_id,
         customer_unique_id,
-        cast(customer_zip_code_prefix as string) as zip_code_prefix,
-        lower(trim(customer_city)) as city,
-        upper(trim(customer_state)) as state
+        {{standardize_text('cast(customer_zip_code_prefix as string)')}} as zip_code_prefix,
+        {{standardize_text('customer_city')}} as city,
+        {{standardize_text('customer_state')}} as state
 from source
     
 )
