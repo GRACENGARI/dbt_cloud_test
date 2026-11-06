@@ -4,8 +4,8 @@ with source as (
 
 renamed as (
     select
-        {{standardise_text('product_category_name')}}as category_name,
-        {{standardise_text('product_category_name_english')}}as category_name_en
+        {{standardize_text('product_category_name')}}as category_name,
+        {{standardize_text('product_category_name_english')}}as category_name_en
     from source
 )
 

@@ -11,6 +11,10 @@ renamed as (
         order_id,
         review_score,
         review_comment_title as comment_title,
+            --  Date preview logic
+
+        {# Date preview logic#}
+
         {{standardize_text('review_comment_message')}} as comment_message,
         {{standardize_text('safe_cast(review_creation_date as timestamp)')}} as review_created_at,
         {{standardize_text('safe_cast(review_answer_timestamp as timestamp)')}} as review_answered_at
