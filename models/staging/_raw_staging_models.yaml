@@ -1,0 +1,226 @@
+version: 2
+
+models:
+  - name: stg_olist_customers
+    description: "Staged customer records from the raw Olist data."
+    columns:
+      - name: customer_id
+        description: "Order-level customer identifier."
+        data_tests:
+          - unique
+          - not_null
+      - name: customer_unique_id
+        description: "Unique identifier of a customer across orders."
+        data_tests:
+          - not_null
+      - name: zip_code_prefix
+        description: "First five digits of the customer zip code."
+      - name: city
+        description: "Customer city."
+      - name: state
+        description: "Customer state."
+
+  - name: stg_olist_geolocation
+    description: "Staged Brazilian zip code geolocation data."
+    columns:
+      - name: geolocation_zip_code_prefix
+        description: "First five digits of the zip code."
+        data_tests:
+          - not_null
+      - name: geolocation_lat
+        description: "Latitude."
+      - name: geolocation_lng
+        description: "Longitude."
+      - name: geolocation_city
+        description: "City name."
+      - name: geolocation_state
+        description: "State code."
+
+  - name: stg_olist_order_items
+    description: "Staged order line items. One row per item within an order."
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - order_id
+            - order_item_number
+    columns:
+      - name: order_id
+        description: "Order identifier."
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_olist_orders')
+              field: order_id
+      - name: order_item_number
+        description: "Sequential item number within an order."
+        data_tests:
+          - not_null
+      - name: product_id
+        description: "Product identifier."
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_olist_products')
+              field: product_id
+      - name: seller_id
+        description: "Seller identifier."
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_olist_sellers')
+              field: seller_id
+      - name: shipping_limit_date
+        description: "Seller shipping deadline for handing the item to the carrier."
+      - name: item_price
+        description: "Item price."
+        data_tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+      - name: freight_amount
+        description: "Freight cost for the item."
+        data_tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+
+  - name: stg_olist_order_payments
+    description: "Staged order payments. An order can have multiple payments."
+    columns:
+      - name: order_id
+        description: "Order identifier."
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_olist_orders')
+              field: order_id
+      - name: payment_sequence_number
+        description: "Sequence number when multiple payment methods are used."
+      - name: total_payment_value
+        description: "Payment method chosen."
+      - name: installment_count
+        description: "Number of installments chosen."
+      - name: total_payment_value
+        description: "Transaction value."
+        data_tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+
+  - name: stg_olist_order_reviews
+    description: "Staged customer reviews of orders."
+    columns:
+      - name: review_id
+        description: "Review identifier."
+        data_tests:
+          - not_null
+      - name: order_id
+        description: "Order identifier."
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_olist_orders')
+              field: order_id
+      - name: review_score
+        description: "Satisfaction score from 1 to 5."
+        data_tests:
+          - dbt_utils.accepted_range:
+              min_value: 1
+              max_value: 5
+      - name: review_comment_title
+        description: "Comment title left by the customer."
+      - name: review_comment_message
+        description: "Comment message left by the customer."
+      - name: review_creation_date
+        description: "Date the satisfaction survey was sent."
+      - name: review_answer_timestamp
+        description: "Timestamp the survey was answered."
+
+  - name: stg_olist_orders
+    description: "Staged orders. One row per order."
+    columns:
+      - name: order_id
+        description: "Unique order identifier."
+        data_tests:
+          - unique
+          - not_null
+      - name: customer_id
+        description: "Customer identifier for the order."
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_olist_customers')
+              field: customer_id
+      - name: order_status
+        description: "Order status (delivered, shipped, canceled, etc.)."
+        data_tests:
+          - accepted_values:
+              values:
+                - created
+                - approved
+                - invoiced
+                - processing
+                - shipped
+                - delivered
+                - unavailable
+                - canceled
+      - name: order_purchase_timestamp
+        description: "When the order was placed."
+        data tests:
+          -not_in_future
+      - name: order_approved_at
+        description: "When payment was approved."
+      - name: order_delivered_carrier_date
+        description: "When the order was handed to the carrier."
+      - name: order_delivered_customer_date
+        description: "When the order was delivered to the customer."
+      - name: order_estimated_delivery_date
+        description: "Estimated delivery date given to the customer."
+
+  - name: stg_olist_product_category
+    description: "Staged product category name translations (Portuguese to English)."
+    columns:
+      - name: product_category_name
+        description: "Category name in Portuguese."
+        data_tests:
+          - unique
+          - not_null
+      - name: product_category_name_english
+        description: "Category name in English."
+
+  - name: stg_olist_products
+    description: "Staged product catalog."
+    columns:
+      - name: product_id
+        description: "Unique product identifier."
+        data_tests:
+          - unique
+          - not_null
+      - name: product_category_name
+        description: "Root category of the product, in Portuguese."
+      - name: product_name_lenght
+        description: "Number of characters in the product name."
+      - name: product_description_lenght
+        description: "Number of characters in the product description."
+      - name: product_photos_qty
+        description: "Number of product photos."
+      - name: product_weight_g
+        description: "Product weight in grams."
+      - name: product_length_cm
+        description: "Product length in centimeters."
+      - name: product_height_cm
+        description: "Product height in centimeters."
+      - name: product_width_cm
+        description: "Product width in centimeters."
+
+  - name: stg_olist_sellers
+    description: "Staged seller records."
+    columns:
+      - name: seller_id
+        description: "Unique seller identifier."
+        data_tests:
+          - unique
+          - not_null
+      - name: seller_zip_code_prefix
+        description: "First five digits of the seller zip code."
+      - name: seller_city
+        description: "Seller city."
+      - name: seller_state
+        description: "Seller state."
