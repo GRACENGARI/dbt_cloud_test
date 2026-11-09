@@ -1,3 +1,8 @@
+{{ config(
+    materialized = 'view',
+    tags = ['intermediate']
+) }}
+
 with items as (
     select
         order_id,
