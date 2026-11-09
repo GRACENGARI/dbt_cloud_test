@@ -124,6 +124,10 @@ models:
           - dbt_utils.accepted_range:
               min_value: 1
               max_value: 5
+              config:
+                  warn_if: ">0"
+                  error_if: ">50"
+
       - name: comment_title
         description: "Comment title left by the customer."
       - name: comment_message

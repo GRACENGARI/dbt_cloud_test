@@ -47,4 +47,5 @@ models:
     mart:
       +materialized: table
       +schema: analytics 
-
+data_tests: 
+  store_failures: true
