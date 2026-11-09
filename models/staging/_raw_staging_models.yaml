@@ -23,17 +23,17 @@ models:
   - name: stg_olist_geolocation
     description: "Staged Brazilian zip code geolocation data."
     columns:
-      - name: geolocation_zip_code_prefix
+      - name: zip_code_prefix
         description: "First five digits of the zip code."
         data_tests:
           - not_null
-      - name: geolocation_lat
+      - name: lat
         description: "Latitude."
-      - name: geolocation_lng
+      - name: lng
         description: "Longitude."
-      - name: geolocation_city
+      - name: city
         description: "City name."
-      - name: geolocation_state
+      - name: state
         description: "State code."
 
   - name: stg_olist_order_items
@@ -124,13 +124,13 @@ models:
           - dbt_utils.accepted_range:
               min_value: 1
               max_value: 5
-      - name: review_comment_title
+      - name: comment_title
         description: "Comment title left by the customer."
-      - name: review_comment_message
+      - name: comment_message
         description: "Comment message left by the customer."
-      - name: review_creation_date
+      - name: review_created_at
         description: "Date the satisfaction survey was sent."
-      - name: review_answer_timestamp
+      - name: review_answered_at
         description: "Timestamp the survey was answered."
 
   - name: stg_olist_orders
@@ -161,28 +161,28 @@ models:
                 - delivered
                 - unavailable
                 - canceled
-      - name: order_purchase_timestamp
+      - name: order_purchased_at
         description: "When the order was placed."
         data tests:
           -not_in_future
       - name: order_approved_at
         description: "When payment was approved."
-      - name: order_delivered_carrier_date
+      - name: order_delivered_at
         description: "When the order was handed to the carrier."
-      - name: order_delivered_customer_date
+      - name: order_delivered_to_carrier_at
         description: "When the order was delivered to the customer."
-      - name: order_estimated_delivery_date
+      - name: order_estimated_delivery_at
         description: "Estimated delivery date given to the customer."
 
   - name: stg_olist_product_category
     description: "Staged product category name translations (Portuguese to English)."
     columns:
-      - name: product_category_name
+      - name: category_name
         description: "Category name in Portuguese."
         data_tests:
           - unique
           - not_null
-      - name: product_category_name_english
+      - name: category_name_en
         description: "Category name in English."
 
   - name: stg_olist_products
@@ -193,21 +193,21 @@ models:
         data_tests:
           - unique
           - not_null
-      - name: product_category_name
+      - name: category_name
         description: "Root category of the product, in Portuguese."
-      - name: product_name_lenght
+      - name: name_length
         description: "Number of characters in the product name."
-      - name: product_description_lenght
+      - name: description_length
         description: "Number of characters in the product description."
-      - name: product_photos_qty
+      - name: photos_qty
         description: "Number of product photos."
-      - name: product_weight_g
+      - name: weight_g
         description: "Product weight in grams."
-      - name: product_length_cm
+      - name: length_cm
         description: "Product length in centimeters."
-      - name: product_height_cm
+      - name: height_cm
         description: "Product height in centimeters."
-      - name: product_width_cm
+      - name: width_cm
         description: "Product width in centimeters."
 
   - name: stg_olist_sellers
@@ -218,9 +218,9 @@ models:
         data_tests:
           - unique
           - not_null
-      - name: seller_zip_code_prefix
+      - name: zip_code_prefix
         description: "First five digits of the seller zip code."
-      - name: seller_city
+      - name: city
         description: "Seller city."
-      - name: seller_state
+      - name: state
         description: "Seller state."
