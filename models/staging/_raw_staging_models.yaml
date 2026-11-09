@@ -10,7 +10,7 @@ models:
           - unique
           - not_null
       - name: customer_unique_id
-        description: "Unique identifier of a customer across orders."
+        description: '{{ doc("customer_unique_id") }}'
         data_tests:
           - not_null
       - name: zip_code_prefix
@@ -37,7 +37,7 @@ models:
         description: "State code."
 
   - name: stg_olist_order_items
-    description: "Staged order line items. One row per item within an order."
+    description: '{{ doc("order_items_grain") }}'
     data_tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
@@ -138,7 +138,7 @@ models:
         description: "Timestamp the survey was answered."
 
   - name: stg_olist_orders
-    description: "Staged orders. One row per order."
+    description: "one row per order"
     columns:
       - name: order_id
         description: "Unique order identifier."
@@ -153,7 +153,7 @@ models:
               to: ref('stg_olist_customers')
               field: customer_id
       - name: order_status
-        description: "Order status (delivered, shipped, canceled, etc.)."
+        description: '{{ doc("order_status_meaning") }}'
         data_tests:
           - accepted_values:
               values:

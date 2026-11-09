@@ -4,6 +4,7 @@ snapshots:
     description: >
       Tracks all changes to the customers table over time.
     config:
+      enable: false 
       schema: snapshots
       unique_key: customer_id
       strategy: check
