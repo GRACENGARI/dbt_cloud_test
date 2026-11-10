@@ -1,3 +1,11 @@
+--Business Question:How many orders per month? What’s the average delivery time? How many were delivered late or cancelled? What’s the average order value?
+{{
+    config(
+        tags= ['orders']
+    )
+    
+    }}
+
 select
     *,
     date_diff(date(delivered_at), date(purchased_at), day) as days_to_deliver,

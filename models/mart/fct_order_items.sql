@@ -1,3 +1,10 @@
+--Business Question:What’s revenue by product category or seller? What’s the freight cost vs. price? Which products are bought together?
+{{
+    config(
+        tags= ['order_item']
+    )
+    
+    }}
 select
     concat(order_id, '-', cast(order_item_number as string)) as order_item_key,
     *
