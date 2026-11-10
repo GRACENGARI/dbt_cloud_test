@@ -1,0 +1,89 @@
+unit_tests:
+  - name: test_dim_customers_aggregates_orders
+    description: One customer with 2 orders gets total_orders = 2 and lifetime_value = sum of payments.
+    model: dim_customers
+    given:
+      - input: ref('int_orders_enriched')
+        rows:
+          - {
+              customer_unique_id: "a",
+              customer_city: "nairobi",
+              customer_state: "KE",
+              purchased_at: "2026-01-01 10:00:00",
+              order_id: "o1",
+              total_payment_value: 100,
+            }
+          - {
+              customer_unique_id: "a",
+              customer_city: "nairobi",
+              customer_state: "KE",
+              purchased_at: "2026-02-01 10:00:00",
+              order_id: "o2",
+              total_payment_value: 50,
+            }
+    expect:
+      rows:
+        - {
+            customer_unique_id: "a",
+            customer_city: "nairobi",
+            customer_state: "KE",
+            total_orders: 2,
+            lifetime_value: 150,
+          }
+
+  - name: test_dim_customers_first_and_last_order_dates
+    description: first_order_at is the earliest purchase and last_order_at is the latest.
+    model: dim_customers
+    given:
+      - input: ref('int_orders_enriched')
+        rows:
+          - {
+              customer_unique_id: "a",
+              customer_city: "nairobi",
+              customer_state: "KE",
+              purchased_at: "2026-03-15 09:00:00",
+              order_id: "o3",
+              total_payment_value: 20,
+            }
+          - {
+              customer_unique_id: "a",
+              customer_city: "nairobi",
+              customer_state: "KE",
+              purchased_at: "2026-01-05 08:00:00",
+              order_id: "o1",
+              total_payment_value: 30,
+            }
+    expect:
+      rows:
+        - {
+            customer_unique_id: "a",
+            first_order_at: "2026-01-05 08:00:00",
+            last_order_at: "2026-03-15 09:00:00",
+          }
+
+  - name: test_dim_customers_one_row_per_customer
+    description: Two different customers produce two separate rows.
+    model: dim_customers
+    given:
+      - input: ref('int_orders_enriched')
+        rows:
+          - {
+              customer_unique_id: "a",
+              customer_city: "nairobi",
+              customer_state: "KE",
+              purchased_at: "2026-01-01 10:00:00",
+              order_id: "o1",
+              total_payment_value: 100,
+            }
+          - {
+              customer_unique_id: "b",
+              customer_city: "meru",
+              customer_state: "KE",
+              purchased_at: "2026-01-02 10:00:00",
+              order_id: "o2",
+              total_payment_value: 40,
+            }
+    expect:
+      rows:
+        - { customer_unique_id: "a", total_orders: 1, lifetime_value: 100 }
+        - { customer_unique_id: "b", total_orders: 1, lifetime_value: 40 }

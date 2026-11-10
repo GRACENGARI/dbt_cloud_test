@@ -1,3 +1,10 @@
+--Business Question :Which categories sell best? Which products are returned or poorly reviewed?
+{{
+    config(
+        tags= ['products']
+    )
+    
+    }}
 select
     p.product_id,
     p.category_name as product_category_name,
