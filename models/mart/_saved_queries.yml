@@ -1,0 +1,12 @@
+version: 2
+
+saved_queries:
+  - name: revenue_by_state
+    label: Revenue by customer state
+    description: "Revenue and order count by customer state."
+    query_params:
+      metrics:
+        - total_revenue
+        - order_count
+      group_by:
+        - "Dimension('customer__customer_state')"
