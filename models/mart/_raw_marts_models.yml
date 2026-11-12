@@ -5,26 +5,41 @@ models:
     description: "One row per unique customer. Answers: where are our customers, and who are repeat buyers?"
 
     config:
-      contract: 
+      contract:
         enforced: true
+
+    semantic_model:
+      enabled: true
+    agg_time_dimension: first_order_at
+
     columns:
       - name: customer_unique_id
         data_type: string
         description: "Unique customer identifier (grain of this table)."
+        entity:
+          type: primary
+          name: customer
         data_tests:
           - unique
           - not_null
       - name: customer_city
         data_type: string
         description: "Customer city."
+        dimension:
+          type: categorical
       - name: customer_state
         data_type: string
         description: "Customer state."
+        dimension:
+          type: categorical
       - name: first_order_at
-        data_type: Timestamp
+        data_type: timestamp
         description: "Timestamp of the customer's first order."
+        granularity: day
+        dimension:
+          type: time
       - name: last_order_at
-        data_type: Timestamp
+        data_type: timestamp
         description: "Timestamp of the customer's most recent order."
       - name: total_orders
         data_type: int64
@@ -33,29 +48,75 @@ models:
         data_type: float64
         description: "Total amount the customer has spent."
 
+    metrics:
+      - name: total_customers
+        label: Total Customers
+        description: "Count of unique customers."
+        type: simple
+        agg: count_distinct
+        expr: customer_unique_id
+      - name: repeat_customers
+        label: Repeat Customers
+        description: "Customers with more than one order."
+        type: simple
+        agg: count_distinct
+        expr: case when total_orders > 1 then customer_unique_id end
+      - name: total_lifetime_value
+        label: Total Lifetime Value
+        description: "Sum of customer lifetime value."
+        type: simple
+        agg: sum
+        expr: lifetime_value
+      - name: avg_lifetime_value
+        label: Average Lifetime Value
+        description: "Average lifetime value per customer."
+        type: simple
+        agg: average
+        expr: lifetime_value
+
   - name: dim_products
     description: "One row per product, with category and physical attributes."
+
+    semantic_model:
+      enabled: true
+
     columns:
       - name: product_id
         description: "Unique product identifier."
+        entity:
+          type: primary
+          name: product
         data_tests:
           - unique
           - not_null
       - name: product_category_name
         description: "Product category."
+        dimension:
+          type: categorical
 
   - name: dim_sellers
     description: "One row per seller, with location."
+
+    semantic_model:
+      enabled: true
+
     columns:
       - name: seller_id
         description: "Unique seller identifier."
+        entity:
+          type: primary
+          name: seller
         data_tests:
           - unique
           - not_null
       - name: seller_city
         description: "Seller city."
+        dimension:
+          type: categorical
       - name: seller_state
         description: "Seller state."
+        dimension:
+          type: categorical
 
   - name: fct_orders
     description: "One row per order. Status, timestamps, and order-level metrics."
@@ -88,10 +149,18 @@ models:
 
   - name: fct_order_items
     description: "One row per item within an order. Price, freight, and keys to product and seller."
+
+    semantic_model:
+      enabled: true
+    primary_entity: order_item
+    # purchased_at must be a timestamp in fct_order_items.sql (cast from string)
+    agg_time_dimension: purchased_at
+
     data_tests:
       - dbt_utils.unique_combination_of_columns:
           arguments:
             combination_of_columns: [order_id, order_item_key]
+
     columns:
       - name: order_id
         description: "Order this item belongs to."
@@ -107,6 +176,9 @@ models:
           - not_null
       - name: product_id
         description: "Product key."
+        entity:
+          type: foreign
+          name: product
         data_tests:
           - relationships:
               arguments:
@@ -114,12 +186,80 @@ models:
                 field: product_id
       - name: seller_id
         description: "Seller key."
+        entity:
+          type: foreign
+          name: seller
         data_tests:
           - relationships:
               arguments:
                 to: ref('dim_sellers')
                 field: seller_id
-      - name: price
+      - name: customer_unique_id
+        description: "Customer key (joins to dim_customers)."
+        entity:
+          type: foreign
+          name: customer
+      - name: purchased_at
+        description: "Timestamp the order was placed."
+        granularity: day
+        dimension:
+          type: time
+      - name: item_price
         description: "Item price."
-      - name: freight_value
+      - name: freight_amount
         description: "Freight cost for the item."
+
+    metrics:
+      - name: total_revenue
+        label: Total Revenue
+        description: "Sum of item prices."
+        type: simple
+        agg: sum
+        expr: item_price
+      - name: total_freight
+        label: Total Freight
+        description: "Sum of freight costs."
+        type: simple
+        agg: sum
+        expr: freight_amount
+      - name: order_count
+        label: Order Count
+        description: "Number of distinct orders."
+        type: simple
+        agg: count_distinct
+        expr: order_id
+      - name: item_count
+        label: Item Count
+        description: "Number of order items."
+        type: simple
+        agg: count
+        expr: order_item_key
+      - name: avg_item_price
+        label: Average Item Price
+        description: "Average price per item."
+        type: simple
+        agg: average
+        expr: item_price
+      - name: max_item_price
+        label: Max Item Price
+        description: "Highest item price."
+        type: simple
+        agg: max
+        expr: item_price
+
+metrics:
+  - name: repeat_customer_rate
+    label: Repeat Customer Rate
+    description: "Share of customers who ordered more than once."
+    type: ratio
+    numerator: repeat_customers
+    denominator: total_customers
+
+  - name: average_order_value
+    label: Average Order Value
+    description: "Total revenue divided by number of orders."
+    type: derived
+    expr: total_revenue / order_count
+    input_metrics:
+      - name: total_revenue
+      - name: order_count

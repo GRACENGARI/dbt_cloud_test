@@ -1,11 +1,16 @@
---Business Question:What’s revenue by product category or seller? What’s the freight cost vs. price? Which products are bought together?
 {{
     config(
-        tags= ['order_item']
+        tags=['order_item']
     )
-    
-    }}
+}}
+
 select
-    concat(order_id, '-', cast(order_item_number as string)) as order_item_key,
-    *
-from {{ ref('int_order_items_enriched') }}
+    concat(i.order_id, '-', cast(i.order_item_number as string)) as order_item_key,
+    i.*,
+    cast(o.purchased_at as timestamp) as purchased_at,
+    c.customer_unique_id
+from {{ ref('int_order_items_enriched') }} as i
+left join {{ ref('fct_orders') }} as o
+    on i.order_id = o.order_id
+left join {{ ref('stg_olist_customers') }} as c
+    on o.customer_id = c.customer_id
