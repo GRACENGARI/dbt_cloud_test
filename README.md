@@ -58,12 +58,12 @@ flowchart LR
 ### Source schema (raw Olist)
 The raw data is normalized across 9 tables: orders, order_items, order_payments, order_reviews, customers, sellers, products, product_category and geolocation.
 
-![Raw source ERD](docs/images/erd_source.png)
+![Raw source ERD](https://github.com/GRACENGARI/dbt_cloud_test/blob/main/erd%20source%20.png)
 
 ### Mart star schema
 The marts reshape this into a star schema: two fact tables and four dimensions.
 
-![Mart ERD](docs/images/erd_marts.png)
+![Mart ERD](https://github.com/GRACENGARI/dbt_cloud_test/blob/main/erd%20marts%20.png)
 
 | Model | Type | Grain | Highlights |
 |---|---|---|---|
@@ -88,7 +88,10 @@ The marts reshape this into a star schema: two fact tables and four dimensions.
 
 Full DAG for `fct_order_items`, from raw sources through staging, intermediate and marts to the semantic model and its metrics.
 
-![dbt lineage graph](docs/images/lineage.png)
+![dbt lineage graph](https://github.com/GRACENGARI/dbt_cloud_test/blob/main/lineage%20png.png)
+![dbt lineage graph](https://github.com/GRACENGARI/dbt_cloud_test/blob/main/Dag%20lineage.png)
+
+
 
 ---
 
@@ -111,7 +114,7 @@ Defining metrics once means every dashboard and query uses the same business def
 
 ## Testing and data quality
 
-- The latest `dbt test` run passed **87 of 87** tests, with 0 warnings and 0 errors.
+- The latest `dbt test` run passed **67 of 67** tests, with 0 warnings and 0 errors.
 - Tests cover keys (`unique`, `not_null`) and relationships between staging, intermediate and mart models.
 <!-- TODO: add singular tests, accepted_values tests or dbt_utils/dbt_expectations tests if used -->
 
@@ -187,5 +190,5 @@ dbt_cloud_test/
 
 ## Author
 
-**Grace Ngari**: Data Scientist and AI Engineer, Nairobi, Kenya
+**Grace Ngari**:
 GitHub: [@GRACENGARI](https://github.com/GRACENGARI)
